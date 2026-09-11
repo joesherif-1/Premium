@@ -1,0 +1,4 @@
+project_id = "premium-website"
+
+[functions.stripe-webhook]
+verify_jwt = false
