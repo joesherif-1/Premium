@@ -11,6 +11,8 @@ interface CartContextValue {
   clear: () => void;
   subtotalCents: number;
   itemCount: number;
+  /** Increments every time an item is added, so UI (e.g. the cart icon) can trigger a one-off animation. */
+  bumpKey: number;
 }
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
@@ -29,6 +31,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
+  const [bumpKey, setBumpKey] = useState(0);
+
   const addItem = (product: Product, quantity = 1) => {
     setItems((prev) => {
       const existing = prev.find((i) => i.product.id === product.id);
@@ -39,6 +43,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, { product, quantity }];
     });
+    setBumpKey((k) => k + 1);
   };
 
   const removeItem = (productId: string) => {
@@ -65,7 +70,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ items, addItem, removeItem, setQuantity, clear, subtotalCents, itemCount }}
+      value={{ items, addItem, removeItem, setQuantity, clear, subtotalCents, itemCount, bumpKey }}
     >
       {children}
     </CartContext.Provider>

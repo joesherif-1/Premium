@@ -35,3 +35,5 @@ supabase/.temp
 
 # Scratch copies for pasting into the Supabase dashboard (duplicate of supabase/functions/)
 dashboard-paste/
+.vercel
+.env*

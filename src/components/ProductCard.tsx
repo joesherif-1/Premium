@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { formatPrice } from '../lib/format';
@@ -6,6 +7,13 @@ import type { Product } from '../types';
 export function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
   const outOfStock = product.stock <= 0;
+  const [added, setAdded] = useState(false);
+
+  const handleAdd = () => {
+    addItem(product);
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 900);
+  };
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-shadow hover:shadow-lg">
@@ -29,11 +37,15 @@ export function ProductCard({ product }: { product: Product }) {
             {formatPrice(product.price_cents, product.currency)}
           </span>
           <button
-            onClick={() => addItem(product)}
+            onClick={handleAdd}
             disabled={outOfStock}
-            className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+            className={`rounded-md px-3 py-1.5 text-xs font-semibold text-white transition-all duration-200 active:scale-90 disabled:cursor-not-allowed disabled:bg-slate-300 ${
+              added ? 'bg-emerald-600' : 'bg-slate-900 hover:bg-slate-700'
+            }`}
           >
-            {outOfStock ? 'Out of stock' : 'Add to cart'}
+            <span key={added ? 'added' : 'idle'} className="inline-block animate-add-pop">
+              {outOfStock ? 'Out of stock' : added ? 'Added ✓' : 'Add to cart'}
+            </span>
           </button>
         </div>
       </div>

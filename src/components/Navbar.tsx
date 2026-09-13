@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -9,7 +10,15 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function Navbar() {
   const { user, isAdmin, signOut } = useAuth();
-  const { itemCount } = useCart();
+  const { itemCount, bumpKey } = useCart();
+
+  const [bumping, setBumping] = useState(false);
+  useEffect(() => {
+    if (bumpKey === 0) return;
+    setBumping(true);
+    const t = setTimeout(() => setBumping(false), 420);
+    return () => clearTimeout(t);
+  }, [bumpKey]);
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur">
@@ -40,7 +49,7 @@ export function Navbar() {
         <div className="ml-auto flex items-center gap-4">
           <Link
             to="/cart"
-            className="relative text-sm font-medium text-slate-600 hover:text-slate-900"
+            className={`relative text-sm font-medium text-slate-600 hover:text-slate-900 ${bumping ? 'animate-cart-bump' : ''}`}
           >
             Cart
             {itemCount > 0 && (

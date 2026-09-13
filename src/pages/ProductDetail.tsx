@@ -16,6 +16,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [myRating, setMyRating] = useState(0);
   const [myComment, setMyComment] = useState('');
@@ -119,11 +120,19 @@ export default function ProductDetail() {
               className="w-20 rounded-md border border-slate-300 px-3 py-2 text-sm"
             />
             <button
-              onClick={() => addItem(product, quantity)}
+              onClick={() => {
+                addItem(product, quantity);
+                setAdded(true);
+                window.setTimeout(() => setAdded(false), 900);
+              }}
               disabled={product.stock <= 0}
-              className="rounded-md bg-slate-900 px-6 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:bg-slate-300"
+              className={`rounded-md px-6 py-2 text-sm font-semibold text-white transition-all duration-200 active:scale-90 disabled:bg-slate-300 ${
+                added ? 'bg-emerald-600' : 'bg-slate-900 hover:bg-slate-700'
+              }`}
             >
-              Add to cart
+              <span key={added ? 'added' : 'idle'} className="inline-block animate-add-pop">
+                {added ? 'Added ✓' : 'Add to cart'}
+              </span>
             </button>
           </div>
         </div>
