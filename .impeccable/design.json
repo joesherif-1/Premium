@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-07T00:00:00Z",
+  "title": "Design System: Premium",
+  "extensions": {
+    "colorMeta": {
+      "stock": { "role": "neutral", "displayName": "Stock Grey", "canonical": "#e7e8e6", "tonalRamp": ["#2a2b29", "#4a4c49", "#6b6d6a", "#8e908d", "#b0b2af", "#c8cac7", "#e7e8e6", "#f3f3f1"] },
+      "plate": { "role": "neutral", "displayName": "Plate Paper", "canonical": "#f3f3f1", "tonalRamp": ["#2d2d2b", "#4d4d4b", "#707070", "#939391", "#b5b5b3", "#d3d3d1", "#e8e8e6", "#f3f3f1"] },
+      "sunken": { "role": "neutral", "displayName": "Sunken Grey", "canonical": "#d9dbd7", "tonalRamp": ["#252623", "#464844", "#686a66", "#8a8c88", "#a9aba7", "#c0c2be", "#d9dbd7", "#ececea"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#131413", "tonalRamp": ["#131413", "#2b2c2a", "#444543", "#5e5f5d", "#7a7b79", "#979896", "#b8b9b7", "#dcdcdb"] },
+      "muted-ink": { "role": "neutral", "displayName": "Muted Ink", "canonical": "#494d49", "tonalRamp": ["#1f211f", "#303330", "#494d49", "#626662", "#7c807c", "#979a97", "#b3b6b3", "#d1d3d1"] },
+      "hairline": { "role": "neutral", "displayName": "Hairline", "canonical": "#bcbfba", "tonalRamp": ["#3a3c39", "#585a57", "#757773", "#92948f", "#a8aba6", "#bcbfba", "#d3d5d1", "#e8e9e6"] },
+      "signal-yellow": { "role": "primary", "displayName": "Signal Yellow", "canonical": "#f2c200", "tonalRamp": ["#4a3c00", "#6e5900", "#947600", "#bd9800", "#f2c200", "#f7d44d", "#fae291", "#fdf3cc"] },
+      "in-stock-green": { "role": "status", "displayName": "In-Stock Green", "canonical": "#2b6a2f", "tonalRamp": ["#10301a", "#1a4a21", "#2b6a2f", "#418a46", "#62a866", "#8cc490", "#b8dcba", "#e0f0e1"] },
+      "pending-umber": { "role": "status", "displayName": "Pending Umber", "canonical": "#7a4f00", "tonalRamp": ["#2e1d00", "#4d3100", "#7a4f00", "#9c6a0a", "#bd8a2e", "#d6ab62", "#e9cd9d", "#f6e9d2"] },
+      "alert-red": { "role": "status", "displayName": "Alert Red", "canonical": "#b3261e", "tonalRamp": ["#4a0f0b", "#721812", "#b3261e", "#cc4a42", "#df7771", "#ec9f9a", "#f6c9c6", "#fbe8e7"] }
+    },
+    "darkTheme": {
+      "note": "Same tokens re-assigned under :root[data-theme='dark'] or prefers-color-scheme: dark when no light override. Yellow and accent-ink are unchanged.",
+      "stock": "#111210",
+      "plate": "#1b1c1a",
+      "sunken": "#252623",
+      "ink": "#ecece8",
+      "muted-ink": "#a3a6a1",
+      "hairline": "#3a3c39",
+      "signal-yellow": "#f2c200",
+      "in-stock-green": "#7bc47f",
+      "pending-umber": "#e8b84a",
+      "alert-red": "#ff8a80"
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page headlines; Hanken Grotesk 800, -0.035em, never past 6rem." },
+      "headline": { "displayName": "Headline", "purpose": "Section heads set in the display voice." },
+      "title": { "displayName": "Title", "purpose": "Product names on plates and index rows." },
+      "body": { "displayName": "Body", "purpose": "Descriptions and notes at 14-16px." },
+      "label": { "displayName": "Spec Label", "purpose": "Uppercase 12px label in spec rows only." },
+      "numeral": { "displayName": "Numeral", "purpose": "Geist Mono tabular: catalogue numbers, prices, stock, ratings, totals." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease-out-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Entrance of headline, plates and Reveal blocks (0.6-0.8s, small 16-24px rise)." },
+      { "name": "state-swap", "value": "150ms colour transition", "purpose": "Button, link and icon-button fill swaps; active nudges 1px down." },
+      { "name": "plate-image-zoom", "value": "scale 1.03 over 700ms ease-out", "purpose": "Photograph on plate hover." },
+      { "name": "add-label-swap", "value": "150ms fade with 6px vertical shift", "purpose": "Add to cart, Added, Sold out label change; Added holds 1.4s." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Ink Button",
+      "kind": "button",
+      "refersTo": "button-ink",
+      "description": "Default for navigation and submit actions.",
+      "html": "<button class=\"ds-btn-ink\">Shop the range</button>",
+      "css": ".ds-btn-ink { background: var(--ink, #131413); color: var(--bg, #e7e8e6); padding: 12px 20px; border: 0; border-radius: 2px; font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 150ms, color 150ms; } .ds-btn-ink:hover { background: var(--accent, #f2c200); color: var(--accent-ink, #131413); } .ds-btn-ink:active { transform: translateY(1px); } .ds-btn-ink:focus-visible { outline: 2px solid var(--ink, #131413); outline-offset: 2px; }"
+    },
+    {
+      "name": "Quiet Button (default Add)",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Ink outline that fills yellow on hover; the default Add to cart.",
+      "html": "<button class=\"ds-btn-quiet\">Add to cart</button>",
+      "css": ".ds-btn-quiet { background: transparent; color: var(--ink, #131413); padding: 10px 16px; border: 1px solid var(--ink, #131413); border-radius: 2px; font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: background-color 150ms, color 150ms; } .ds-btn-quiet:hover { background: var(--accent, #f2c200); color: var(--accent-ink, #131413); } .ds-btn-quiet:active { transform: translateY(1px); } .ds-btn-quiet:focus-visible { outline: 2px solid var(--ink, #131413); outline-offset: 2px; }"
+    },
+    {
+      "name": "Accent Button (primary)",
+      "kind": "button",
+      "refersTo": "button-accent",
+      "description": "Solid yellow, the single primary action on the product page.",
+      "html": "<button class=\"ds-btn-accent\">Add to cart</button>",
+      "css": ".ds-btn-accent { background: var(--accent, #f2c200); color: var(--accent-ink, #131413); padding: 12px 20px; border: 0; border-radius: 2px; font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 150ms, color 150ms; } .ds-btn-accent:hover { background: var(--ink, #131413); color: var(--bg, #e7e8e6); } .ds-btn-accent:focus-visible { outline: 2px solid var(--ink, #131413); outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary action; Ink outline filling Ink on hover.",
+      "html": "<button class=\"ds-btn-ghost\">Sign out</button>",
+      "css": ".ds-btn-ghost { background: transparent; color: var(--ink, #131413); padding: 10px 16px; border: 1px solid var(--ink, #131413); border-radius: 2px; font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: background-color 150ms, color 150ms; } .ds-btn-ghost:hover { background: var(--ink, #131413); color: var(--bg, #e7e8e6); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--ink, #131413); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Plate Paper input with a 45% Ink border that goes solid on hover and focus.",
+      "html": "<label class=\"ds-label\" for=\"ds-email\">Email</label><input id=\"ds-email\" class=\"ds-field\" placeholder=\"you@example.com\" /><p class=\"ds-help\">We only use it to sign you in.</p>",
+      "css": ".ds-label { display: block; margin-bottom: 6px; font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: var(--ink, #131413); } .ds-field { width: 100%; box-sizing: border-box; padding: 10px 14px; background: var(--surface, #f3f3f1); color: var(--ink, #131413); border: 1px solid color-mix(in srgb, var(--ink, #131413) 45%, transparent); border-radius: 2px; font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; font-size: 14px; transition: border-color 150ms; } .ds-field::placeholder { color: var(--muted, #494d49); } .ds-field:hover, .ds-field:focus { border-color: var(--ink, #131413); } .ds-field:focus-visible { outline: 2px solid var(--ink, #131413); outline-offset: 2px; } .ds-help { margin: 6px 0 0; font-size: 13px; color: var(--muted, #494d49); }"
+    },
+    {
+      "name": "Navigation Bar",
+      "kind": "nav",
+      "refersTo": "plate-caption",
+      "description": "Sticky ruled bar: wordmark with yellow square full stop, underlined active link.",
+      "html": "<header class=\"ds-nav\"><a class=\"ds-wordmark\">Premium<span class=\"ds-dot\"></span></a><nav><a class=\"ds-link ds-link-active\">Shop</a><a class=\"ds-link\">My account</a></nav></header>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 32px; height: 64px; padding: 0 24px; background: var(--bg, #e7e8e6); border-bottom: 1px solid var(--ink, #131413); font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; } .ds-nav nav { display: flex; gap: 28px; } .ds-wordmark { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink, #131413); } .ds-dot { display: inline-block; width: 0.3em; height: 0.3em; margin-left: 2px; border: 1px solid var(--ink, #131413); background: var(--accent, #f2c200); } .ds-link { padding: 4px 0; border-bottom: 2px solid transparent; font-size: 14px; font-weight: 600; color: var(--muted, #494d49); transition: color 150ms; } .ds-link:hover { color: var(--ink, #131413); } .ds-link-active { border-bottom-color: var(--ink, #131413); color: var(--ink, #131413); } .ds-link:focus-visible { outline: 2px solid var(--ink, #131413); outline-offset: 2px; }"
+    },
+    {
+      "name": "Plate (lead and compact)",
+      "kind": "card",
+      "refersTo": "plate-caption-lead",
+      "description": "Photograph over an Ink rule and caption: number, name, mono price, Add, mono stock. Lead caption prints on yellow.",
+      "html": "<article class=\"ds-plate\"><div class=\"ds-photo\"></div><div class=\"ds-caption ds-caption-lead\"><div class=\"ds-row\"><span class=\"ds-num\">01</span><span class=\"ds-name\">Aero Headphones</span><span class=\"ds-num\">$149.00</span></div><div class=\"ds-row ds-row-end\"><button class=\"ds-add\">Add to cart</button><span class=\"ds-num ds-stock\">12 in stock</span></div></div></article>",
+      "css": ".ds-plate { max-width: 420px; font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; color: var(--ink, #131413); } .ds-photo { aspect-ratio: 3 / 2; background: var(--sunken, #d9dbd7); } .ds-caption { padding: 12px; border-top: 1px solid var(--ink, #131413); } .ds-caption-lead { background: var(--accent, #f2c200); color: var(--accent-ink, #131413); } .ds-row { display: flex; align-items: baseline; gap: 12px; } .ds-row-end { justify-content: space-between; align-items: center; margin-top: 16px; } .ds-name { flex: 1; min-width: 0; font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-num { font-family: 'Geist Mono Variable', ui-monospace, monospace; font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 500; } .ds-stock { font-size: 13px; font-weight: 400; } .ds-add { padding: 10px 16px; background: var(--ink, #131413); color: var(--bg, #e7e8e6); border: 0; border-radius: 2px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background-color 150ms, color 150ms; } .ds-add:hover { background: var(--bg, #e7e8e6); color: var(--ink, #131413); } .ds-add:focus-visible { outline: 2px solid var(--ink, #131413); outline-offset: 2px; }"
+    },
+    {
+      "name": "Spec Row",
+      "kind": "custom",
+      "refersTo": "plate-caption",
+      "description": "Label-left, value-right line under a 1px Ink rule; the catalogue's native list form.",
+      "html": "<dl class=\"ds-spec-list\"><div class=\"ds-spec\"><dt class=\"ds-spec-label\">Prices</dt><dd>Your total is recalculated from the catalog before you pay.</dd></div><div class=\"ds-spec\"><dt class=\"ds-spec-label\">Stock</dt><dd>Inventory only drops after payment is confirmed.</dd></div></dl>",
+      "css": ".ds-spec-list { margin: 0; font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; color: var(--ink, #131413); } .ds-spec { display: grid; grid-template-columns: 7.5rem 1fr; column-gap: 16px; padding: 12px 0; border-top: 1px solid var(--ink, #131413); font-size: 14px; } .ds-spec dd { margin: 0; max-width: 56ch; font-size: 16px; } .ds-spec-label { padding-top: 2px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted, #494d49); }"
+    },
+    {
+      "name": "Yellow Closing Band",
+      "kind": "custom",
+      "refersTo": "closing-band",
+      "description": "Flat full-width yellow field with Ink headline and an Ink button; the system's one big use of colour.",
+      "html": "<section class=\"ds-band\"><div><h2 class=\"ds-band-title\">Save what you love.</h2><p class=\"ds-band-copy\">Create an account to keep a wishlist and follow your orders.</p></div><button class=\"ds-band-btn\">Create account</button></section>",
+      "css": ".ds-band { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 32px; padding: 48px; background: var(--accent, #f2c200); color: var(--accent-ink, #131413); font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; } .ds-band-title { margin: 0; font-size: 3rem; font-weight: 800; line-height: 0.95; letter-spacing: -0.035em; } .ds-band-copy { margin: 12px 0 0; max-width: 44ch; font-size: 16px; } .ds-band-btn { padding: 14px 24px; background: var(--accent-ink, #131413); color: var(--bg, #e7e8e6); border: 0; border-radius: 2px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 150ms, color 150ms; } .ds-band-btn:hover { background: var(--bg, #e7e8e6); color: var(--accent-ink, #131413); } .ds-band-btn:focus-visible { outline: 2px solid var(--accent-ink, #131413); outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Printed Sheet",
+    "overview": "Premium is set as a 1960s-70s Braun and Rams product catalogue: grey offset-printed stock, near-black ink, and one signal yellow. The whole range is meant to read as one sheet, so \"curated and small\" is visible rather than claimed. Every product is a numbered plate with a ruled caption and a mono spec line; pages sit on a rigid 12-column grid and refuse the centered hero over an identical card grid.\n\nThe system is flat and typographic. Structure comes from hairline ink rules, ruled rows and scale contrast between a heavy tight grotesk and a monospaced data voice. There are no shadows, no gradients and no rounded softness: every corner is 2px. Yellow is a printed field, never a glow. Green and red are not brand colors; they exist only to state stock and order status.\n\nLight and dark themes both exist (CSS variables, data-theme override on the root, otherwise the OS preference). The dark theme is the same sheet printed on black stock; yellow and the 2px shape lock do not change.",
+    "keyCharacteristics": [
+      "Grey stock, near-black ink, one signal yellow used as flat fields.",
+      "Heavy tight Hanken Grotesk for voice, Geist Mono for every numeral and datum.",
+      "Numbered plates: a product's catalogue number is its rank among active products, shared by every page that shows it.",
+      "Hairline rules and spec rows instead of cards, borders-with-shadow or panels.",
+      "2px corners everywhere that is not a circle; zero shadows; zero gradients."
+    ],
+    "rules": [
+      { "name": "The Flat Field Rule", "body": "Yellow is a filled rectangle with Ink text on it, or a hover fill. It is never a text color on grey, a border, a gradient, a glow or a thin accent line.", "section": "colors" },
+      { "name": "The One Primary Rule", "body": "Solid yellow buttons (button-accent) mark the single primary action of a page (the product page's Add). Everywhere else the default button is Ink-filled or the Ink-outline quiet button; active and selected states are Ink-filled (the saved-wishlist heart is the one yellow state in the build).", "section": "colors" },
+      { "name": "The Status Only Rule", "body": "Green, umber and red state facts about stock and orders. They are never decoration, never category colors.", "section": "colors" },
+      { "name": "The Mono Facts Rule", "body": "Anything a shopper might compare or add up (number, price, stock, rating, quantity, total) is set in .num. Prose is never mono.", "section": "typography" },
+      { "name": "The Heavy Voice Rule", "body": "Headlines are weight 800 with negative tracking; there is no light or regular display weight.", "section": "typography" },
+      { "name": "The No Shadow Rule", "body": "Separate things with a rule or a field change. No box-shadow, drop-shadow or gradient exists anywhere in the build.", "section": "elevation" },
+      { "name": "The Shape Lock Rule", "body": "2px or square, nothing in between and nothing rounder. Do not introduce pill shapes or large radii.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do show the catalogue number (zero-padded, mono) wherever a product appears, drawn from useCatalogueNumbers so it is identical on every page.",
+      "Do use Ink 1px rules to open a block, and Hairline for separators within a list.",
+      "Do set prices, stock, ratings and counts in Geist Mono with tabular figures.",
+      "Do use btn-quiet as the default Add button, btn-ink for navigation and submit, btn-accent only for a page's single primary action.",
+      "Do keep text on yellow in Ink (#131413) in both themes.",
+      "Do keep the 2px shape lock and the 2px Ink focus outline.",
+      "Do let admin follow the same tokens with scanability first: ruled rows, mono data, status colours for stock and order state."
+    ],
+    "donts": [
+      "Don't use yellow as text, border, underline or gradient on a grey ground; it is a fill only.",
+      "Don't use green, umber or red for anything but stock and order status or form errors.",
+      "Don't add shadows, gradients, blur, pills or radii above 2px.",
+      "Don't replace the 12-column plate sheet with a centered hero over an identical card grid.",
+      "Don't set prose or headlines in the mono voice, or numerals in the grotesk.",
+      "Don't invent testimonials, press or sales figures as proof; real price, live stock and real rating are the proof."
+    ]
+  }
+}
