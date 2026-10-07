@@ -8,15 +8,17 @@ interface Stats {
   orderCount: number;
   productCount: number;
   lowStockCount: number;
+  /** null when the is_featured column has not been added yet (migration 0003). */
+  featuredCount: number | null;
 }
 
 const LOW_STOCK_THRESHOLD = 10;
 
-function StatCard({ label, value }: { label: string; value: string }) {
+function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-5">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-slate-900">{value}</p>
+    <div className="border-t border-ink pt-3">
+      <p className="spec-label">{label}</p>
+      <p className="num mt-2 text-4xl font-medium tracking-tight">{value}</p>
     </div>
   );
 }
@@ -26,7 +28,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     (async () => {
-      const [paidOrders, orderCount, productCount, lowStock] = await Promise.all([
+      const [paidOrders, orderCount, productCount, lowStock, featured] = await Promise.all([
         supabase.from('orders').select('total_cents').in('status', ['paid', 'fulfilled']),
         supabase.from('orders').select('*', { count: 'exact', head: true }),
         supabase.from('products').select('*', { count: 'exact', head: true }),
@@ -34,6 +36,10 @@ export default function AdminDashboard() {
           .from('products')
           .select('*', { count: 'exact', head: true })
           .lt('stock', LOW_STOCK_THRESHOLD),
+        supabase
+          .from('products')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_featured', true),
       ]);
 
       const revenueCents = (paidOrders.data ?? []).reduce((s, o) => s + o.total_cents, 0);
@@ -43,31 +49,45 @@ export default function AdminDashboard() {
         orderCount: orderCount.count ?? 0,
         productCount: productCount.count ?? 0,
         lowStockCount: lowStock.count ?? 0,
+        featuredCount: featured.error ? null : (featured.count ?? 0),
       });
     })();
   }, []);
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+      <h1 className="display text-4xl md:text-6xl">Dashboard</h1>
       {!stats ? (
-        <p className="mt-6 text-slate-500">Loading…</p>
+        <div
+          className="mt-10 grid grid-cols-2 gap-x-6 gap-y-8 lg:grid-cols-3"
+          role="status"
+          aria-label="Loading stats"
+        >
+          {Array.from({ length: 5 }, (_, i) => (
+            <div key={i} className="skeleton h-24" />
+          ))}
+        </div>
       ) : (
         <>
-          <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <StatCard label="Revenue (paid orders)" value={formatPrice(stats.revenueCents)} />
-            <StatCard label="Total orders" value={String(stats.orderCount)} />
-            <StatCard label="Products" value={String(stats.productCount)} />
-            <StatCard label="Low stock (< 10)" value={String(stats.lowStockCount)} />
+          <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-3">
+            <Stat label="Revenue (paid orders)" value={formatPrice(stats.revenueCents)} />
+            <Stat label="Total orders" value={String(stats.orderCount)} />
+            <Stat label="Products" value={String(stats.productCount)} />
+            <Stat label={`Low stock (under ${LOW_STOCK_THRESHOLD})`} value={String(stats.lowStockCount)} />
+            <Stat
+              label="Featured on home"
+              value={stats.featuredCount === null ? 'n/a' : String(stats.featuredCount)}
+            />
           </div>
           {stats.lowStockCount > 0 && (
-            <p className="mt-6 text-sm text-amber-700">
-              {stats.lowStockCount} product{stats.lowStockCount > 1 ? 's are' : ' is'} running low
-              on stock —{' '}
-              <Link to="/admin/inventory" className="underline">
-                review inventory
+            <p className="mt-10 border-t border-ink pt-4 text-sm">
+              <span className="font-semibold text-danger">
+                {stats.lowStockCount} product{stats.lowStockCount > 1 ? 's are' : ' is'} running low on
+                stock.
+              </span>{' '}
+              <Link to="/admin/inventory" className="font-semibold underline">
+                Review inventory
               </Link>
-              .
             </p>
           )}
         </>

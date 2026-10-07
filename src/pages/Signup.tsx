@@ -1,5 +1,8 @@
+import { EnvelopeSimple } from '@phosphor-icons/react';
+import { motion } from 'motion/react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { AuthShell } from '../components/AuthShell';
 import { useAuth } from '../context/AuthContext';
 
 export default function Signup() {
@@ -23,67 +26,96 @@ export default function Signup() {
 
   if (done) {
     return (
-      <div className="mx-auto max-w-sm px-4 py-16 text-center sm:px-6">
-        <h1 className="text-xl font-bold text-slate-900">Check your email</h1>
-        <p className="mt-3 text-slate-600">
-          We sent a confirmation link to <strong>{email}</strong>. Confirm it, then sign in.
-        </p>
-        <Link to="/login" className="mt-6 inline-block text-indigo-600 hover:underline">
-          Go to sign in
-        </Link>
+      <div className="page py-24">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
+          className="mx-auto max-w-sm text-center"
+        >
+          <EnvelopeSimple size={44} className="mx-auto text-ink" />
+          <h1 className="mt-5 text-3xl font-semibold tracking-tight">Check your email</h1>
+          <p className="mt-3 text-muted">
+            We sent a confirmation link to <strong className="text-ink">{email}</strong>. Confirm it,
+            then sign in.
+          </p>
+          <Link to="/login" className="btn btn-ink mt-8">
+            Go to sign in
+          </Link>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-sm px-4 py-16 sm:px-6">
-      <h1 className="text-2xl font-bold text-slate-900">Create an account</h1>
-      <form onSubmit={submit} className="mt-8 space-y-4">
+    <AuthShell
+      title="Create an account"
+      subtitle="Save products to a wishlist and follow your orders."
+      footer={
+        <>
+          Already have an account?{' '}
+          <Link to="/login" className="font-medium text-ink underline underline-offset-4">
+            Sign in
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={submit} className="space-y-5">
         <div>
-          <label className="text-sm font-medium text-slate-700">Full name</label>
+          <label htmlFor="signup-name" className="label">
+            Full name
+          </label>
           <input
+            id="signup-name"
+            autoComplete="name"
             required
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="field"
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-slate-700">Email</label>
+          <label htmlFor="signup-email" className="label">
+            Email
+          </label>
           <input
+            id="signup-email"
             type="email"
+            autoComplete="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="field"
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-slate-700">Password</label>
+          <label htmlFor="signup-password" className="label">
+            Password
+          </label>
           <input
+            id="signup-password"
             type="password"
+            autoComplete="new-password"
             required
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="field"
+            aria-describedby="signup-password-help"
           />
+          <p id="signup-password-help" className="help">
+            At least 6 characters.
+          </p>
+          {error && (
+            <p role="alert" className="error-text">
+              {error}
+            </p>
+          )}
         </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-md bg-slate-900 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:bg-slate-400"
-        >
-          Sign up
+        <button type="submit" disabled={loading} className="btn btn-ink w-full py-3 text-[15px]">
+          {loading ? 'Creating account' : 'Create account'}
         </button>
       </form>
-      <p className="mt-4 text-sm text-slate-500">
-        Already have an account?{' '}
-        <Link to="/login" className="text-indigo-600 hover:underline">
-          Sign in
-        </Link>
-      </p>
-    </div>
+    </AuthShell>
   );
 }

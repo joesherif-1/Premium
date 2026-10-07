@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { AuthShell } from '../components/AuthShell';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
@@ -24,44 +25,56 @@ export default function Login() {
   };
 
   return (
-    <div className="mx-auto max-w-sm px-4 py-16 sm:px-6">
-      <h1 className="text-2xl font-bold text-slate-900">Sign in</h1>
-      <form onSubmit={submit} className="mt-8 space-y-4">
+    <AuthShell
+      title="Welcome back"
+      subtitle="Sign in to see your orders and wishlist."
+      footer={
+        <>
+          No account?{' '}
+          <Link to="/signup" className="font-medium text-ink underline underline-offset-4">
+            Create one
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={submit} className="space-y-5">
         <div>
-          <label className="text-sm font-medium text-slate-700">Email</label>
+          <label htmlFor="login-email" className="label">
+            Email
+          </label>
           <input
+            id="login-email"
             type="email"
+            autoComplete="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="field"
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-slate-700">Password</label>
+          <label htmlFor="login-password" className="label">
+            Password
+          </label>
           <input
+            id="login-password"
             type="password"
+            autoComplete="current-password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="field"
           />
+          {error && (
+            <p role="alert" className="error-text">
+              {error}
+            </p>
+          )}
         </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-md bg-slate-900 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:bg-slate-400"
-        >
-          Sign in
+        <button type="submit" disabled={loading} className="btn btn-ink w-full py-3 text-[15px]">
+          {loading ? 'Signing in' : 'Sign in'}
         </button>
       </form>
-      <p className="mt-4 text-sm text-slate-500">
-        No account?{' '}
-        <Link to="/signup" className="text-indigo-600 hover:underline">
-          Sign up
-        </Link>
-      </p>
-    </div>
+    </AuthShell>
   );
 }

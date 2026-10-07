@@ -1,54 +1,104 @@
-import { useState } from 'react';
+import { Star } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import { useCatalogueNumbers } from '../hooks/useCatalogueNumbers';
+import { useRatingStats } from '../hooks/useRatingStats';
 import { formatPrice } from '../lib/format';
 import type { Product } from '../types';
+import { AddToCartButton } from './AddToCartButton';
+import { WishlistButton } from './WishlistButton';
 
-export function ProductCard({ product }: { product: Product }) {
-  const { addItem } = useCart();
-  const outOfStock = product.stock <= 0;
-  const [added, setAdded] = useState(false);
+/**
+ * One catalogue plate: photograph, then a ruled caption with its catalogue number,
+ * name, price, rating and stock. The number is the product's rank in the active
+ * catalogue, so it reads the same on every page, filter and sort.
+ */
+export function ProductCard({
+  product,
+  tone = 'plain',
+  compact = false,
+  wide = false,
+}: {
+  product: Product;
+  /** "lead" prints the caption on the signal-yellow field. */
+  tone?: 'plain' | 'lead';
+  /** Shorter plate for dense sheets: no description, add and stock share a row. */
+  compact?: boolean;
+  /** Landscape photograph for a plate that spans two columns. */
+  wide?: boolean;
+}) {
+  const stat = useRatingStats()[product.id];
+  const number = useCatalogueNumbers()[product.id];
+  const soldOut = product.stock <= 0;
+  const lowStock = !soldOut && product.stock <= 5;
+  const href = `/products/${product.slug}`;
+  const lead = tone === 'lead';
+  const aspect = wide ? 'aspect-[16/9]' : compact ? 'aspect-[16/7]' : lead ? 'aspect-[3/2]' : 'aspect-[5/4]';
 
-  const handleAdd = () => {
-    addItem(product);
-    setAdded(true);
-    window.setTimeout(() => setAdded(false), 900);
-  };
+  const stock = (
+    <p
+      className={`num text-[13px] ${
+        lowStock ? 'font-semibold text-danger' : lead ? 'text-accent-ink' : 'text-muted'
+      }`}
+    >
+      {soldOut ? 'Sold out' : lowStock ? `Only ${product.stock} left` : `${product.stock} in stock`}
+    </p>
+  );
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-shadow hover:shadow-lg">
-      <Link to={`/products/${product.slug}`} className="aspect-square overflow-hidden bg-slate-100">
-        {product.image_url && (
-          <img
-            src={product.image_url}
-            alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            loading="lazy"
-          />
-        )}
-      </Link>
-      <div className="flex flex-1 flex-col gap-1 p-4">
-        <Link to={`/products/${product.slug}`} className="font-medium text-slate-900 hover:underline">
-          {product.name}
+    <article className="group flex flex-col">
+      <div className="relative">
+        <Link to={href} aria-label={product.name} className={`block overflow-hidden bg-sunken ${aspect}`}>
+          {product.image_url && (
+            <img
+              src={product.image_url}
+              alt=""
+              loading="lazy"
+              className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+            />
+          )}
         </Link>
-        <p className="text-sm text-slate-500 line-clamp-2">{product.description}</p>
-        <div className="mt-auto flex items-center justify-between pt-3">
-          <span className="font-semibold text-slate-900">
+        <WishlistButton productId={product.id} className="absolute right-2 top-2" />
+      </div>
+
+      <div className={`flex flex-1 flex-col border-t border-ink p-3 ${lead ? 'bg-accent text-accent-ink' : ''}`}>
+        <div className="flex items-baseline gap-3">
+          {number !== undefined && (
+            <span className="num text-sm font-medium">{String(number).padStart(2, '0')}</span>
+          )}
+          <Link
+            to={href}
+            className="min-w-0 flex-1 truncate text-[15px] font-bold underline-offset-4 hover:underline"
+          >
+            {product.name}
+          </Link>
+          <span className="num shrink-0 text-[15px] font-medium">
             {formatPrice(product.price_cents, product.currency)}
           </span>
-          <button
-            onClick={handleAdd}
-            disabled={outOfStock}
-            className={`rounded-md px-3 py-1.5 text-xs font-semibold text-white transition-all duration-200 active:scale-90 disabled:cursor-not-allowed disabled:bg-slate-300 ${
-              added ? 'bg-emerald-600' : 'bg-slate-900 hover:bg-slate-700'
-            }`}
-          >
-            <span key={added ? 'added' : 'idle'} className="inline-block animate-add-pop">
-              {outOfStock ? 'Out of stock' : added ? 'Added ✓' : 'Add to cart'}
-            </span>
-          </button>
+        </div>
+
+        {!compact && (
+          <>
+            <p className={`num mt-1 flex items-center gap-1.5 text-[12px] ${lead ? '' : 'text-muted'}`}>
+              {stat ? (
+                <>
+                  <Star size={13} weight="fill" />
+                  {stat.avg.toFixed(1)} ({stat.count})
+                </>
+              ) : (
+                'No ratings yet'
+              )}
+            </p>
+            <p className={`mt-2 line-clamp-2 min-h-10 text-[13px] leading-5 ${lead ? '' : 'text-muted'}`}>
+              {product.description}
+            </p>
+          </>
+        )}
+
+        <div className={`flex items-center justify-between gap-3 ${compact ? 'mt-3' : 'mt-4'}`}>
+          <AddToCartButton product={product} small invert={lead} />
+          {stock}
         </div>
       </div>
-    </div>
+    </article>
   );
 }

@@ -1,3 +1,4 @@
+import { Plus, Trash, X } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { formatPrice } from '../../lib/format';
 import { supabase } from '../../lib/supabaseClient';
@@ -28,6 +29,7 @@ export default function AdminInventory() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tableError, setTableError] = useState<string | null>(null);
 
   const load = async () => {
     const [{ data: p }, { data: c }] = await Promise.all([
@@ -44,13 +46,23 @@ export default function AdminInventory() {
   }, []);
 
   const updateProduct = async (id: string, patch: Partial<Product>) => {
+    setTableError(null);
     setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
-    await supabase.from('products').update(patch).eq('id', id);
+    const { error: updateError } = await supabase.from('products').update(patch).eq('id', id);
+    if (updateError) {
+      setTableError(updateError.message);
+      load();
+    }
   };
 
   const deleteProduct = async (id: string) => {
     if (!confirm('Delete this product? This cannot be undone.')) return;
-    await supabase.from('products').delete().eq('id', id);
+    setTableError(null);
+    const { error: deleteError } = await supabase.from('products').delete().eq('id', id);
+    if (deleteError) {
+      setTableError(deleteError.message);
+      return;
+    }
     setProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
@@ -83,134 +95,208 @@ export default function AdminInventory() {
     load();
   };
 
-  if (loading) return <p className="text-slate-500">Loading…</p>;
+  if (loading) {
+    return (
+      <div role="status" aria-label="Loading inventory">
+        <div className="skeleton h-12 w-56" />
+        <div className="skeleton mt-8 h-72 w-full" />
+      </div>
+    );
+  }
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Inventory</h1>
+      <div className="flex items-end justify-between gap-4">
+        <h1 className="display text-4xl md:text-6xl">Inventory</h1>
         <button
+          type="button"
           onClick={() => setShowForm((s) => !s)}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+          className={`btn btn-sm ${showForm ? 'btn-ghost' : 'btn-ink'}`}
         >
+          {showForm ? <X size={16} /> : <Plus size={16} />}
           {showForm ? 'Cancel' : 'Add product'}
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={createProduct} className="mt-6 grid grid-cols-2 gap-4 rounded-lg border border-slate-200 p-4">
-          <input
-            placeholder="Name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="col-span-2 rounded-md border border-slate-300 px-3 py-2 text-sm"
-          />
-          <textarea
-            placeholder="Description"
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="col-span-2 rounded-md border border-slate-300 px-3 py-2 text-sm"
-            rows={2}
-          />
-          <input
-            placeholder="Price (USD)"
-            type="number"
-            step="0.01"
-            value={form.price}
-            onChange={(e) => setForm({ ...form, price: e.target.value })}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
-          />
-          <input
-            placeholder="Stock"
-            type="number"
-            value={form.stock}
-            onChange={(e) => setForm({ ...form, stock: e.target.value })}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
-          />
-          <input
-            placeholder="Image URL"
-            value={form.image_url}
-            onChange={(e) => setForm({ ...form, image_url: e.target.value })}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
-          />
-          <select
-            value={form.category_id}
-            onChange={(e) => setForm({ ...form, category_id: e.target.value })}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
-          >
-            <option value="">No category</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-          {error && <p className="col-span-2 text-sm text-red-600">{error}</p>}
-          <button
-            type="submit"
-            disabled={saving}
-            className="col-span-2 rounded-md bg-slate-900 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:bg-slate-400"
-          >
-            Create product
+        <form
+          onSubmit={createProduct}
+          className="mt-8 grid gap-4 border border-ink p-5 sm:grid-cols-2 md:p-6"
+        >
+          <div className="sm:col-span-2">
+            <label htmlFor="p-name" className="label">
+              Name
+            </label>
+            <input
+              id="p-name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              className="field"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label htmlFor="p-desc" className="label">
+              Description
+            </label>
+            <textarea
+              id="p-desc"
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              className="field"
+              rows={2}
+            />
+          </div>
+          <div>
+            <label htmlFor="p-price" className="label">
+              Price (USD)
+            </label>
+            <input
+              id="p-price"
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.price}
+              onChange={(e) => setForm({ ...form, price: e.target.value })}
+              className="field"
+            />
+          </div>
+          <div>
+            <label htmlFor="p-stock" className="label">
+              Stock
+            </label>
+            <input
+              id="p-stock"
+              type="number"
+              min="0"
+              value={form.stock}
+              onChange={(e) => setForm({ ...form, stock: e.target.value })}
+              className="field"
+            />
+          </div>
+          <div>
+            <label htmlFor="p-image" className="label">
+              Image URL
+            </label>
+            <input
+              id="p-image"
+              value={form.image_url}
+              onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+              className="field"
+            />
+          </div>
+          <div>
+            <label htmlFor="p-cat" className="label">
+              Category
+            </label>
+            <select
+              id="p-cat"
+              value={form.category_id}
+              onChange={(e) => setForm({ ...form, category_id: e.target.value })}
+              className="field"
+            >
+              <option value="">No category</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {error && (
+            <p role="alert" className="error-text sm:col-span-2">
+              {error}
+            </p>
+          )}
+          <button type="submit" disabled={saving} className="btn btn-ink sm:col-span-2">
+            {saving ? 'Creating' : 'Create product'}
           </button>
         </form>
       )}
 
-      <div className="mt-6 overflow-x-auto rounded-lg border border-slate-200">
-        <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
-            <tr>
-              <th className="p-3">Product</th>
-              <th className="p-3">Price</th>
-              <th className="p-3">Stock</th>
-              <th className="p-3">Active</th>
-              <th className="p-3" />
+      {tableError && (
+        <p role="alert" className="error-text mt-6">
+          {tableError}
+        </p>
+      )}
+
+      <div className="mt-8 overflow-x-auto">
+        <table className="w-full min-w-[640px] text-sm">
+          <thead>
+            <tr className="border-b border-ink text-left">
+              <th className="spec-label py-3 pr-4 font-semibold">Product</th>
+              <th className="spec-label py-3 pr-4 font-semibold">Price</th>
+              <th className="spec-label py-3 pr-4 font-semibold">Stock</th>
+              <th className="spec-label py-3 pr-4 font-semibold">Active</th>
+              <th className="spec-label py-3 pr-4 font-semibold">Featured</th>
+              <th className="py-3" />
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody>
             {products.map((p) => (
-              <tr key={p.id}>
-                <td className="flex items-center gap-3 p-3">
-                  <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-slate-100">
-                    {p.image_url && (
-                      <img src={p.image_url} alt="" className="h-full w-full object-cover" />
-                    )}
+              <tr key={p.id} className="border-b border-line">
+                <td className="py-3 pr-4">
+                  <div className="flex items-center gap-3">
+                    <div className="size-11 shrink-0 overflow-hidden bg-sunken">
+                      {p.image_url && <img src={p.image_url} alt="" className="size-full object-cover" />}
+                    </div>
+                    <span className="font-bold">{p.name}</span>
                   </div>
-                  <span className="font-medium text-slate-900">{p.name}</span>
                 </td>
-                <td className="p-3">
+                <td className="py-3 pr-4">
+                  <label className="sr-only" htmlFor={`price-${p.id}`}>
+                    Price for {p.name}
+                  </label>
                   <input
+                    id={`price-${p.id}`}
                     type="number"
                     step="0.01"
                     defaultValue={(p.price_cents / 100).toFixed(2)}
                     onBlur={(e) =>
                       updateProduct(p.id, { price_cents: Math.round(Number(e.target.value) * 100) })
                     }
-                    className="w-24 rounded-md border border-slate-300 px-2 py-1"
+                    className="field num w-28! py-1.5"
                   />
-                  <p className="mt-0.5 text-xs text-slate-400">{formatPrice(p.price_cents)}</p>
+                  <p className="num mt-1 text-xs text-muted">{formatPrice(p.price_cents)}</p>
                 </td>
-                <td className="p-3">
+                <td className="py-3 pr-4">
+                  <label className="sr-only" htmlFor={`stock-${p.id}`}>
+                    Stock for {p.name}
+                  </label>
                   <input
+                    id={`stock-${p.id}`}
                     type="number"
+                    min="0"
                     defaultValue={p.stock}
                     onBlur={(e) => updateProduct(p.id, { stock: Number(e.target.value) })}
-                    className="w-20 rounded-md border border-slate-300 px-2 py-1"
+                    className="field num w-24! py-1.5"
                   />
                 </td>
-                <td className="p-3">
+                <td className="py-3 pr-4">
                   <input
                     type="checkbox"
                     checked={p.is_active}
                     onChange={(e) => updateProduct(p.id, { is_active: e.target.checked })}
+                    aria-label={`${p.name} is active`}
+                    className="size-4"
                   />
                 </td>
-                <td className="p-3">
+                <td className="py-3 pr-4">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(p.is_featured)}
+                    onChange={(e) => updateProduct(p.id, { is_featured: e.target.checked })}
+                    aria-label={`${p.name} is featured`}
+                    className="size-4"
+                  />
+                </td>
+                <td className="py-3 text-right">
                   <button
+                    type="button"
                     onClick={() => deleteProduct(p.id)}
-                    className="text-xs font-medium text-red-600 hover:underline"
+                    aria-label={`Delete ${p.name}`}
+                    className="grid size-10 place-items-center text-muted transition-colors hover:bg-danger hover:text-bg"
                   >
-                    Delete
+                    <Trash size={18} />
                   </button>
                 </td>
               </tr>

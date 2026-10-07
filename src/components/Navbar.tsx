@@ -1,81 +1,154 @@
+import { Heart, List, ShoppingBagOpen, X } from '@phosphor-icons/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { ThemeToggle } from './ThemeToggle';
 
-const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `text-sm font-medium transition-colors hover:text-slate-900 ${
-    isActive ? 'text-slate-900' : 'text-slate-500'
+const desktopLink = ({ isActive }: { isActive: boolean }) =>
+  `border-b-2 py-1 text-sm font-semibold transition-colors ${
+    isActive ? 'border-ink text-ink' : 'border-transparent text-muted hover:text-ink'
   }`;
+
+const mobileLink = ({ isActive }: { isActive: boolean }) =>
+  `block border-b border-line py-3.5 text-lg font-semibold ${isActive ? 'text-ink' : 'text-muted'}`;
+
+const iconButton =
+  'grid size-10 place-items-center rounded-xs text-ink transition-colors hover:bg-ink hover:text-bg';
 
 export function Navbar() {
   const { user, isAdmin, signOut } = useAuth();
   const { itemCount, bumpKey } = useCart();
+  const [open, setOpen] = useState(false);
+  const location = useLocation();
 
-  const [bumping, setBumping] = useState(false);
   useEffect(() => {
-    if (bumpKey === 0) return;
-    setBumping(true);
-    const t = setTimeout(() => setBumping(false), 420);
-    return () => clearTimeout(t);
-  }, [bumpKey]);
+    setOpen(false);
+  }, [location.pathname]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-4 sm:px-6">
-        <Link to="/" className="text-lg font-bold tracking-tight text-slate-900">
-          Premium<span className="text-indigo-600">.</span>
+    <header className="sticky top-0 z-40 border-b border-ink bg-bg">
+      <div className="page flex h-16 items-center gap-8">
+        <Link to="/" className="text-xl font-extrabold tracking-[-0.03em] text-ink">
+          Premium
+          <span aria-hidden="true" className="ml-0.5 inline-block size-[0.3em] border border-ink bg-accent" />
         </Link>
 
-        <nav className="hidden items-center gap-6 sm:flex">
-          <NavLink to="/" end className={navLinkClass}>
-            Home
-          </NavLink>
-          <NavLink to="/shop" className={navLinkClass}>
+        <nav aria-label="Primary" className="hidden items-center gap-7 md:flex">
+          <NavLink to="/shop" className={desktopLink}>
             Shop
           </NavLink>
           {user && (
-            <NavLink to="/account" className={navLinkClass}>
-              My Account
+            <NavLink to="/account" className={desktopLink}>
+              My account
             </NavLink>
           )}
           {isAdmin && (
-            <NavLink to="/admin" className={navLinkClass}>
+            <NavLink to="/admin" className={desktopLink}>
               Admin
             </NavLink>
           )}
         </nav>
 
-        <div className="ml-auto flex items-center gap-4">
+        <div className="ml-auto flex items-center gap-1">
+          {user && (
+            <Link to="/account?tab=wishlist" aria-label="Wishlist" className={iconButton}>
+              <Heart />
+            </Link>
+          )}
+
           <Link
             to="/cart"
-            className={`relative text-sm font-medium text-slate-600 hover:text-slate-900 ${bumping ? 'animate-cart-bump' : ''}`}
+            aria-label={`Cart, ${itemCount} item${itemCount === 1 ? '' : 's'}`}
+            className={`${iconButton} relative`}
           >
-            Cart
+            <ShoppingBagOpen />
             {itemCount > 0 && (
-              <span className="absolute -right-3 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-semibold text-white">
+              <motion.span
+                key={bumpKey}
+                initial={{ y: -6, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+                className="num absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center bg-accent px-1 text-[10px] font-medium text-accent-ink"
+              >
                 {itemCount}
-              </span>
+              </motion.span>
             )}
           </Link>
 
-          {user ? (
-            <button
-              onClick={signOut}
-              className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700"
-            >
-              Sign out
-            </button>
-          ) : (
-            <Link
-              to="/login"
-              className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700"
-            >
-              Sign in
-            </Link>
-          )}
+          <ThemeToggle />
+
+          <div className="ml-3 hidden items-center md:flex">
+            {user ? (
+              <button type="button" onClick={signOut} className="btn btn-ghost btn-sm">
+                Sign out
+              </button>
+            ) : (
+              <Link to="/login" className="btn btn-ink btn-sm">
+                Sign in
+              </Link>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            className={`${iconButton} md:hidden`}
+          >
+            {open ? <X /> : <List />}
+          </button>
         </div>
       </div>
+
+      <AnimatePresence>
+        {open && (
+          <motion.nav
+            id="mobile-menu"
+            aria-label="Mobile"
+            initial={{ height: 0 }}
+            animate={{ height: 'auto' }}
+            exit={{ height: 0 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] as const }}
+            className="overflow-hidden border-t border-ink bg-bg md:hidden"
+          >
+            <div className="page py-2">
+              <NavLink to="/shop" className={mobileLink}>
+                Shop
+              </NavLink>
+              {user && (
+                <>
+                  <NavLink to="/account" end className={mobileLink}>
+                    My account
+                  </NavLink>
+                  <NavLink to="/account?tab=wishlist" className={mobileLink}>
+                    Wishlist
+                  </NavLink>
+                </>
+              )}
+              {isAdmin && (
+                <NavLink to="/admin" className={mobileLink}>
+                  Admin
+                </NavLink>
+              )}
+              <div className="py-4">
+                {user ? (
+                  <button type="button" onClick={signOut} className="btn btn-ghost w-full">
+                    Sign out
+                  </button>
+                ) : (
+                  <Link to="/login" className="btn btn-ink w-full">
+                    Sign in
+                  </Link>
+                )}
+              </div>
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
