@@ -36,3 +36,8 @@ from (values
 ) as p(category_slug, name, slug, description, price_cents, image_url, stock)
 join public.categories c on c.slug = p.category_slug
 on conflict do nothing;
+
+-- Featured picks (also set by migration 0003 for databases that were already seeded).
+update public.products
+set is_featured = true
+where slug in ('aria-wireless-headphones', 'orbit-smartwatch', 'halo-smart-lamp');

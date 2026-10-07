@@ -15,6 +15,8 @@ export interface Product {
   image_url: string | null;
   stock: number;
   is_active: boolean;
+  /** Added by migration 0003; absent until it has been applied. */
+  is_featured?: boolean;
   created_at: string;
 }
 
